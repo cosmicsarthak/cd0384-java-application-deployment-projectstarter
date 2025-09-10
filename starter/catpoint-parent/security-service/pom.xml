@@ -52,49 +52,7 @@
                     </execution>
                 </executions>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>com.github.spotbugs</groupId>-->
-<!--                <artifactId>spotbugs-maven-plugin</artifactId>-->
-<!--                <version>4.9.4.2</version>-->
-<!--                <configuration>-->
-<!--                    <effort>Max</effort>-->
-<!--                    <threshold>Low</threshold>-->
-<!--                    <htmlOutput>true</htmlOutput>-->
-<!--                    <xmlOutput>true</xmlOutput>-->
-<!--                    <outputDirectory>${project.build.directory}/site</outputDirectory>-->
-<!--                    <failOnError>false</failOnError>-->
-<!--&lt;!&ndash;                    <includeFilterFile>spotbugs-include.xml</includeFilterFile>&ndash;&gt;-->
-<!--                    <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>analyze</id>-->
-<!--                        <phase>verify</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>spotbugs</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
         </plugins>
     </build>
 
-<!--    <reporting>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>com.github.spotbugs</groupId>-->
-<!--                <artifactId>spotbugs-maven-plugin</artifactId>-->
-<!--                <version>4.9.4.2</version>-->
-<!--                <configuration>-->
-<!--                    <effort>Max</effort>-->
-<!--                    <threshold>Low</threshold>-->
-<!--                    <htmlOutput>true</htmlOutput>-->
-<!--                    <xmlOutput>true</xmlOutput>-->
-<!--                    <includeTests>false</includeTests>-->
-<!--                    <failOnError>false</failOnError>-->
-<!--                    <outputDirectory>${project.build.directory}/site</outputDirectory>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </reporting>-->
 </project>

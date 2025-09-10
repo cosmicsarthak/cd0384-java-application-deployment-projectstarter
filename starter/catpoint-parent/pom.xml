@@ -122,15 +122,7 @@
                   <effort>Max</effort>
                   <threshold>Low</threshold>
                   <xmlOutput>true</xmlOutput>
-<!--                  <htmlOutput>true</htmlOutput>-->
-                  <!--                  <outputDirectory>${project.build.directory}/site</outputDirectory>-->
-<!--                  <includeTests>false</includeTests>-->
                   <failOnError>false</failOnError>
-<!--                  <fork>true</fork>-->
-<!--                  <maxHeap>1024</maxHeap>-->
-                  <!--                  <sourceDirectories>-->
-                  <!--                      <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>-->
-                  <!--                  </sourceDirectories>-->
               </configuration>
           </plugin>
       </plugins>
@@ -147,10 +139,8 @@
                     <effort>Max</effort>
                     <threshold>Low</threshold>
                     <xmlOutput>true</xmlOutput>
-<!--                    <htmlOutput>true</htmlOutput>-->
                     <includeTests>false</includeTests>
                     <failOnError>false</failOnError>
-<!--                    <outputDirectory>${project.build.directory}/site</Directory>-->
                 </configuration>
             </plugin>
         </plugins>
