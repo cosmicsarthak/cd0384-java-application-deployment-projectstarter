@@ -155,12 +155,12 @@ public class SecurityServiceTest {
     @ParameterizedTest
     @EnumSource(value = ArmingStatus.class, names = {"ARMED_HOME", "ARMED_AWAY"})
     void armingStatus_whenArmed_shouldResetAllToInactive(ArmingStatus armingStatus) {
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
         sensor1.setActive(true);
         sensor2.setActive(true);
         Set<Sensor> activeSensors = Set.of(sensor1, sensor2);
         when(securityRepository.getSensors()).thenReturn(activeSensors);
-        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
-        when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.NO_ALARM);
+//        when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.NO_ALARM);
         securityService.setArmingStatus(armingStatus);
         verify(securityRepository, times(2)).updateSensor(any(Sensor.class));
         assertFalse(sensor1.getActive());
@@ -204,12 +204,13 @@ public class SecurityServiceTest {
     //Edge3. arming after disarmed, with active sensors,reset sensors
     @Test
     void armingAfterDisarmedWithActiveSensors_shouldResetSensors() {
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
         sensor1.setActive(true);
         sensor2.setActive(true);
         Set<Sensor> sensors = Set.of(sensor1, sensor2);
         when(securityRepository.getSensors()).thenReturn(sensors);
-        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
-        when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.NO_ALARM);
+//        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
+//        when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.NO_ALARM);
         securityService.setArmingStatus(ArmingStatus.ARMED_HOME);
         assertFalse(sensor1.getActive(), "sensor should be inactive after arming");
         assertFalse(sensor2.getActive(), "sensor should be inactive after arming");

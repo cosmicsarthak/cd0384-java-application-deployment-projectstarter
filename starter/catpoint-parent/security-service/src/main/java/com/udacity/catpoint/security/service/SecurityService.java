@@ -49,9 +49,14 @@ public class SecurityService {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         }
 
-        if (armingStatus == ArmingStatus.ARMED_HOME || armingStatus == ArmingStatus.ARMED_AWAY) {
+        ArmingStatus previousStatus = securityRepository.getArmingStatus();
+        if (armingStatus == ArmingStatus.ARMED_HOME || armingStatus == ArmingStatus.ARMED_AWAY && previousStatus == ArmingStatus.DISARMED) {
             Set<Sensor> sensorsToUpdate = new HashSet<>(getSensors());
-            sensorsToUpdate.forEach(sensor -> {changeSensorActivationStatus(sensor, false);});
+            sensorsToUpdate.forEach(sensor -> {
+                sensor.setActive(false);
+                securityRepository.updateSensor(sensor);
+            });
+            statusListeners.forEach(statusListener -> statusListener.sensorStatusChanged());
         }
 
         securityRepository.setArmingStatus(armingStatus);
@@ -118,13 +123,20 @@ public class SecurityService {
      * Internal method for updating the alarm status when a sensor has been deactivated
      */
     private void handleSensorDeactivated() {
-        if (securityRepository.getAlarmStatus() == AlarmStatus.ALARM) {
-            return;
-        }
+        AlarmStatus currentStatus = securityRepository.getAlarmStatus();
 
-        if (securityRepository.getAlarmStatus() == AlarmStatus.PENDING_ALARM && noSensorActive()) {
+        if (currentStatus == AlarmStatus.PENDING_ALARM && noSensorActive()) {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         }
+//        else if (currentStatus == AlarmStatus.ALARM) {
+//            long activeSensorCount = getSensors().stream().mapToLong(sensor -> sensor.getActive() ? 1 : 0).sum();
+//            if (activeSensorCount == 1) {
+//                setAlarmStatus(AlarmStatus.PENDING_ALARM);
+//            } else if (activeSensorCount == 0) {
+//                setAlarmStatus(AlarmStatus.NO_ALARM);
+//            }
+//        }
+
     }
 
     private boolean noSensorActive() {
