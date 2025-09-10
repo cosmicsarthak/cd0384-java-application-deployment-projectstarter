@@ -15,15 +15,23 @@ import javax.swing.*;
  * all our dependencies and providing them to other classes as necessary.
  */
 public class CatpointGui extends JFrame {
-    private SecurityRepository securityRepository = new PretendDatabaseSecurityRepositoryImpl();
-    private FakeImageService imageService = new FakeImageService();
-    private SecurityService securityService = new SecurityService(securityRepository, imageService);
-    private DisplayPanel displayPanel = new DisplayPanel(securityService);
-    private ControlPanel controlPanel = new ControlPanel(securityService);
-    private SensorPanel sensorPanel = new SensorPanel(securityService);
-    private ImagePanel imagePanel = new ImagePanel(securityService);
+    private transient SecurityRepository securityRepository;
+    private transient FakeImageService imageService;
+    private transient SecurityService securityService;
+    private transient DisplayPanel displayPanel;
+    private transient ControlPanel controlPanel;
+    private transient SensorPanel sensorPanel;
+    private transient ImagePanel imagePanel;
 
     public CatpointGui() {
+        securityRepository = new PretendDatabaseSecurityRepositoryImpl();
+        imageService = new FakeImageService();
+        securityService = new SecurityService(securityRepository, imageService);
+        displayPanel = new DisplayPanel(securityService);
+        controlPanel = new ControlPanel(securityService);
+        sensorPanel = new SensorPanel(securityService);
+        imagePanel = new ImagePanel(securityService);
+
         setLocation(100, 100);
         setSize(600, 850);
         setTitle("Very Secure App");
@@ -36,7 +44,21 @@ public class CatpointGui extends JFrame {
         mainPanel.add(controlPanel, "wrap");
         mainPanel.add(sensorPanel);
 
-        getContentPane().add(mainPanel);
+        setContentPane(mainPanel);
 
     }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+
+//        for spotsbug bug of low priority
+        securityRepository = new PretendDatabaseSecurityRepositoryImpl();
+        imageService = new FakeImageService();
+        securityService = new SecurityService(securityRepository, imageService);
+        displayPanel = new DisplayPanel(securityService);
+        controlPanel = new ControlPanel(securityService);
+        sensorPanel = new SensorPanel(securityService);
+        imagePanel = new ImagePanel(securityService);
+    }
+
 }

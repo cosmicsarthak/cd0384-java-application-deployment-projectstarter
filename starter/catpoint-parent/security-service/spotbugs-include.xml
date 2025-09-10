@@ -1,0 +1,7 @@
+<FindBugsFilter>
+    <Match>
+        <Package name="com.udacity.catpoint.application" />
+        <Package name="com.udacity.catpoint.data" />
+        <Package name="com.udacity.catpoint.service" />
+    </Match>
+</FindBugsFilter>
