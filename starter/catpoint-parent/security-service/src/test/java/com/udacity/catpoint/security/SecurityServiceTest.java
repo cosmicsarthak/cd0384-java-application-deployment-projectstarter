@@ -1,8 +1,8 @@
-package com.udacity.catpoint;
+package com.udacity.catpoint.security;
+import com.udacity.catpoint.security.data.*;
 import com.udacity.catpoint.image.ImageService;
-import com.udacity.catpoint.data.*;
-import com.udacity.catpoint.application.StatusListener;
-import com.udacity.catpoint.service.SecurityService;
+import com.udacity.catpoint.security.application.StatusListener;
+import com.udacity.catpoint.security.service.SecurityService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,6 +67,7 @@ public class SecurityServiceTest {
     // 3. if pending alarm,all sensors are inactive,to no_alarm status
     @Test
     void allSensorInactive_whenPendingAlarm_shouldSetAlarmStatusNoAlarm() {
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
         when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.PENDING_ALARM);
         sensor1.setActive(true);
         Set<Sensor> sensors = Set.of(sensor1);
@@ -79,6 +80,7 @@ public class SecurityServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void sensorsStateChanged_whenAlarmActive_shouldNotChangeAlarmStatus(boolean sensorActive) {
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
         when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.ALARM);
         sensor1.setActive(!sensorActive);
         securityService.changeSensorActivationStatus(sensor1, sensorActive);
@@ -88,6 +90,7 @@ public class SecurityServiceTest {
     // 5. if sensor activated while already active, in pending state,to alarm status
     @Test
     void sensorActivated_whenAlreadyActiveAndPending_setAlarmStatusAlarm() {
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
         when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.PENDING_ALARM);
         sensor1.setActive(true);
         securityService.changeSensorActivationStatus(sensor1, true);
@@ -97,6 +100,7 @@ public class SecurityServiceTest {
     // 6. if sensor deactivated while already inactive,no change to alarm state
     @Test
     void sensorDeactivated_whenAlreadyInactive_shouldNotChangeAlarmStatus() {
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
         sensor1.setActive(false);
         securityService.changeSensorActivationStatus(sensor1, false);
         verify(securityRepository, never()).setAlarmStatus(any(AlarmStatus.class));
@@ -155,6 +159,8 @@ public class SecurityServiceTest {
         sensor2.setActive(true);
         Set<Sensor> activeSensors = Set.of(sensor1, sensor2);
         when(securityRepository.getSensors()).thenReturn(activeSensors);
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
+        when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.NO_ALARM);
         securityService.setArmingStatus(armingStatus);
         verify(securityRepository, times(2)).updateSensor(any(Sensor.class));
         assertFalse(sensor1.getActive());
@@ -193,6 +199,22 @@ public class SecurityServiceTest {
         when(securityRepository.getSensors()).thenReturn(sensors);
         securityService.changeSensorActivationStatus(sensor1, false);
         verify(securityRepository, never()).setAlarmStatus(AlarmStatus.NO_ALARM);
+    }
+
+    //Edge3. arming after disarmed, with active sensors,reset sensors
+    @Test
+    void armingAfterDisarmedWithActiveSensors_shouldResetSensors() {
+        sensor1.setActive(true);
+        sensor2.setActive(true);
+        Set<Sensor> sensors = Set.of(sensor1, sensor2);
+        when(securityRepository.getSensors()).thenReturn(sensors);
+        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.DISARMED);
+        when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.NO_ALARM);
+        securityService.setArmingStatus(ArmingStatus.ARMED_HOME);
+        assertFalse(sensor1.getActive(), "sensor should be inactive after arming");
+        assertFalse(sensor2.getActive(), "sensor should be inactive after arming");
+        verify(securityRepository, times(2)).updateSensor(any(Sensor.class));
+        verify(securityRepository).setArmingStatus(ArmingStatus.ARMED_HOME);
     }
 
     // ListenerStatus1

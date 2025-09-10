@@ -21,7 +21,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.udacity.catpoint.application.CatpointApp</mainClass>
+                  <mainClass>com.udacity.catpoint.security.application.CatpointApp</mainClass>
                 </transformer>
               </transformers>
             </configuration>

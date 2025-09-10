@@ -1,11 +1,11 @@
-package com.udacity.catpoint.service;
+package com.udacity.catpoint.security.service;
 
 import com.udacity.catpoint.image.ImageService;
-import com.udacity.catpoint.application.StatusListener;
-import com.udacity.catpoint.data.AlarmStatus;
-import com.udacity.catpoint.data.ArmingStatus;
-import com.udacity.catpoint.data.SecurityRepository;
-import com.udacity.catpoint.data.Sensor;
+import com.udacity.catpoint.security.application.StatusListener;
+import com.udacity.catpoint.security.data.AlarmStatus;
+import com.udacity.catpoint.security.data.ArmingStatus;
+import com.udacity.catpoint.security.data.SecurityRepository;
+import com.udacity.catpoint.security.data.Sensor;
 
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
@@ -49,14 +49,12 @@ public class SecurityService {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         }
 
-        securityRepository.setArmingStatus(armingStatus);
-
         if (armingStatus == ArmingStatus.ARMED_HOME || armingStatus == ArmingStatus.ARMED_AWAY) {
-            getSensors().forEach(sensor -> {
-                sensor.setActive(false);
-                securityRepository.updateSensor(sensor);
-            });
+            Set<Sensor> sensorsToUpdate = new HashSet<>(getSensors());
+            sensorsToUpdate.forEach(sensor -> {changeSensorActivationStatus(sensor, false);});
         }
+
+        securityRepository.setArmingStatus(armingStatus);
 
         if (armingStatus == ArmingStatus.ARMED_HOME && catDetect) {
             setAlarmStatus(AlarmStatus.ALARM);
@@ -140,9 +138,19 @@ public class SecurityService {
      */
     public void changeSensorActivationStatus(Sensor sensor, Boolean active) {
         AlarmStatus currentAlarmStatus = securityRepository.getAlarmStatus();
+        ArmingStatus currentArmingStatus = securityRepository.getArmingStatus();
+
+        if (currentArmingStatus == ArmingStatus.DISARMED) {
+            sensor.setActive(active);
+            securityRepository.updateSensor(sensor);
+            statusListeners.forEach(statusListener -> statusListener.sensorStatusChanged());
+            return;
+        }
+
         if (currentAlarmStatus == AlarmStatus.ALARM) {
             sensor.setActive(active);
             securityRepository.updateSensor(sensor);
+            statusListeners.forEach(statusListener -> statusListener.sensorStatusChanged());
             return;
         }
 
@@ -151,6 +159,7 @@ public class SecurityService {
                 setAlarmStatus(AlarmStatus.ALARM);
             }
             securityRepository.updateSensor(sensor);
+            statusListeners.forEach(statusListener -> statusListener.sensorStatusChanged());
             return;
         }
 
